@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Work Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #F4620A;
+    --orange-dim: #7a3105;
+    --bg: #0F0F0E;
+    --surface: #181817;
+    --surface2: #222220;
+    --border: #2e2e2b;
+    --text: #E8E4DC;
+    --muted: #6b6b62;
+    --green: #3DBA6F;
+    --red: #E04545;
+    --yellow: #EBAF2A;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--surface);
+    border-bottom: 2px solid var(--orange);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 2px;
+    color: var(--orange);
+  }
+  header .date-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* LAYOUT */
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 20px 16px 80px;
+  }
+
+  /* SECTION CARD */
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+  }
+  .section-header:hover { background: #292926; }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 15px;
+    letter-spacing: 1.5px;
+    color: var(--orange);
+  }
+  .section-icon {
+    font-size: 11px;
+    color: var(--muted);
+    transition: transform 0.2s;
+  }
+  .section.collapsed .section-icon { transform: rotate(-90deg); }
+  .section-body {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .section.collapsed .section-body { display: none; }
+
+  /* FIELDS */
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .field-row.three { grid-template-columns: 1fr 1fr 1fr; }
+  .field-row.full { grid-template-columns: 1fr; }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+  }
+  input[type="text"], input[type="number"], input[type="time"], select, textarea {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    padding: 7px 10px;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--orange);
+  }
+  textarea { resize: vertical; min-height: 70px; line-height: 1.5; }
+  select option { background: var(--bg); }
+
+  /* TOGGLE ROW (Yes/No) */
+  .toggle-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 8px;
+  }
+  .toggle-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 10px;
+  }
+  .toggle-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    color: var(--text);
+    text-transform: uppercase;
+  }
+  .toggle-switch {
+    position: relative;
+    width: 36px;
+    height: 20px;
+  }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute;
+    inset: 0;
+    background: #333;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .toggle-slider:before {
+    content: '';
+    position: absolute;
+    width: 14px; height: 14px;
+    left: 3px; top: 3px;
+    background: var(--muted);
+    border-radius: 50%;
+    transition: 0.2s;
+  }
+  input:checked + .toggle-slider { background: var(--orange-dim); }
+  input:checked + .toggle-slider:before {
+    transform: translateX(16px);
+    background: var(--orange);
+  }
+
+  /* TRUCK ENTRIES */
+  .truck-entry {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px 12px;
+    position: relative;
+  }
+  .truck-entry .remove-btn {
+    position: absolute;
+    top: 8px; right: 10px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+  }
+  .truck-entry .remove-btn:hover { color: var(--red); }
+  .add-btn {
+    background: none;
+    border: 1px dashed var(--border);
+    border-radius: 4px;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    padding: 8px;
+    text-align: center;
+    width: 100%;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .add-btn:hover { border-color: var(--orange); color: var(--orange); }
+
+  /* CREW ENTRIES */
+  .crew-entry {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px 12px;
+    position: relative;
+  }
+  .crew-entry .remove-btn {
+    position: absolute;
+    top: 8px; right: 10px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 16px;
+  }
+  .crew-entry .remove-btn:hover { color: var(--red); }
+
+  /* FLAGGER ROW */
+  .flagger-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .flagger-row input { flex: 1; }
+  .flagger-row button {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 16px;
+  }
+  .flagger-row button:hover { color: var(--red); }
+
+  /* MIC BUTTON */
+  .mic-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    padding: 4px 9px;
+    transition: all 0.15s;
+    vertical-align: middle;
+  }
+  .mic-btn:hover { border-color: var(--orange); color: var(--orange); }
+  .mic-btn.listening {
+    border-color: var(--red);
+    color: var(--red);
+    animation: pulse 1s infinite;
+  }
+  .mic-btn svg { width: 12px; height: 12px; fill: currentColor; }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  label .mic-btn { margin-left: 6px; font-size: 10px; padding: 2px 7px; }
+
+  /* WEATHER */
+  .weather-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .weather-row input[type="number"] { width: 80px; }
+
+  /* TOTAL BADGE */
+  .total-badge {
+    display: inline-block;
+    background: var(--orange);
+    color: #fff;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 1px 7px;
+    border-radius: 10px;
+    margin-left: 8px;
+  }
+
+  /* EXPORT BAR */
+  .export-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--surface);
+    border-top: 2px solid var(--orange);
+    display: flex;
+    gap: 10px;
+    padding: 12px 20px;
+    z-index: 100;
+    justify-content: flex-end;
+  }
+  .btn-primary {
+    background: var(--orange);
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 1px;
+    padding: 8px 22px;
+    transition: opacity 0.15s;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-secondary {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 1px;
+    padding: 8px 22px;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .btn-secondary:hover { border-color: var(--text); color: var(--text); }
+
+  /* MODAL / PREVIEW */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    max-width: 680px;
+    width: 100%;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .modal-header {
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .modal-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 1px;
+    color: var(--orange);
+  }
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 20px;
+  }
+  .modal-close:hover { color: var(--text); }
+  .modal-body {
+    padding: 16px;
+    overflow-y: auto;
+    flex: 1;
+  }
+  .preview-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.8;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .modal-footer {
+    border-top: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+
+  /* VOICE STATUS BAR */
+  .voice-status {
+    background: var(--red);
+    color: #fff;
+    font-size: 11px;
+    text-align: center;
+    padding: 5px;
+    font-family: 'DM Mono', monospace;
+    display: none;
+    position: fixed;
+    top: 53px; left: 0; right: 0;
+    z-index: 99;
+  }
+  .voice-status.show { display: block; }
+
+  /* MISC */
+  hr { border: none; border-top: 1px solid var(--border); margin: 4px 0; }
+  small { font-size: 10px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚠ Daily Work Report</h1>
+  <span class="date-badge" id="headerDate"></span>
+</header>
+
+<div class="voice-status" id="voiceStatus">🎙 Listening...</div>
+
+<div class="container">
+
+  <!-- 1. JOB HEADER -->
+  <div class="section" id="sec-header">
+    <div class="section-header" onclick="toggleSection('sec-header')">
+      <span class="section-title">01 — Job Header</span>
+      <span class="section-icon">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="field-row">
+        <div class="field">
+          <label>Date</label>
+          <input type="text" id="jobDate" placeholder="e.g. Thursday June 5th 2026">
+        </div>
+        <div class="field">
+          <label>Arrival Time</label>
+          <input type="time" id="arrivalTime">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Job Number</label>
+          <input type="text" id="jobNumber" placeholder="e.g. 2510077">
+        </div>
+        <div class="field">
+          <label>Job Name</label>
+          <input type="text" id="jobName" placeholder="e.g. Clare-Dovercourt Integrated Renewal">
+        </div>
+      </div>
+      <div class="field-row three">
+        <div class="field">
+          <label>Temperature (°C)</label>
+          <input type="number" id="temp" placeholder="14">
+        </div>
+        <div class="field">
+          <label>Sky / Conditions</label>
+          <select id="sky">
+            <option value="">-- Select --</option>
+            <option>Blue sky</option>
+            <option>Partially cloudy</option>
+            <option>Cloudy</option>
+            <option>Overcast</option>
+            <option>Raining</option>
+            <option>Heavy rain</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Active Work Location(s)</label>
+          <input type="text" id="workLocation" placeholder="e.g. Clare & Evered">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. TRUCKS -->
+  <div class="section" id="sec-trucks">
+    <div class="section-header" onclick="toggleSection('sec-trucks')">
+      <span class="section-title">02 — Trucks on Site <span class="total-badge" id="truckTotal">0</span></span>
+      <span class="section-icon">▼</span>
+    </div>
+    <div class="section-body" id="truckList">
+      <!-- entries injected here -->
+      <button class="add-btn" onclick="addTruck()">+ Add Truck Group</button>
+    </div>
+  </div>
+
+  <!-- 3. CREWS -->
+  <div class="section" id="sec-crews">
+    <div class="section-header" onclick="toggleSection('sec-crews')">
+      <span class="section-title">03 — Crews on Site</span>
+      <span class="section-icon">▼</span>
+    </div>
+    <div class="section-body" id="crewList">
+      <button class="add-btn" onclick="addCrew()">+ Add Crew</button>
+    </div>
+  </div>
+
+  <!-- 4. EQUIPMENT -->
+  <div class="section" id="sec-equip">
+    <div class="section-header" onclick="toggleSection('sec-equip')">
+      <span class="section-title">04 — Equipment on Site</span>
+      <span class="section-icon">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="field-row three">
+        <div class="field">
+          <label>Shovels / Excavators</label>
+          <input type="text" id="shovels" placeholder="e.g. EX124, EX093">
+        </div>
+        <div class="field">
+          <label>Loaders</label>
+          <input type="text" id="loaders" placeholder="e.g. RL105, RL078">
+        </div>
+        <div class="field">
+          <label>Rollers</label>
+          <input type="text" id="rollers" placeholder="e.g. VP019">
+        </div>
+      </div>
+      <div class="field-row three">
+        <div class="field">
+          <label>Diesel Plates</label>
+          <input type="number" id="plates" placeholder="0" min="0">
+        </div>
+        <div class="field">
+          <label>Jumping Jacks</label>
+          <input type="number" id="jacks" placeholder="0" min="0">
+        </div>
+        <div class="field">
+          <label>Other Equipment</label>
+          <input type="text" id="otherEquip" placeholder="e.g. vac truck, Kubota KX080">
+        </div>
+      </div>
+      <div class="field full">
+        <label>Notes on Equipment Status</label>
+        <textarea id="equipNotes" placeholder="e.g. Hitachi 135US not in use at Tweedsmuir..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. FLAGGERS -->
+  <div class="section" id="sec-flaggers">
+    <div class="section-header" onclick="toggleSection('sec-flaggers')">
+      <span class="section-title">05 — Flaggers <span class="total-badge" id="flaggerTotal">0</span></span>
+      <span class="section-icon">▼</span>
+    </div>
+    <div class="section-body">
+      <div id="flaggerList"></div>
+      <button class="add-btn" onclick="addFlagger()">+ Add Flagger Location</button>
+    </div>
+  </div>
+
+  <!-- 6. WORK PROGRESS -->
+  <div class="section" id="sec-progress">
+    <div class="section-header" onclick="toggleSection('sec-progress')">
+      <span class="section-title">06 — Active Work &amp; Progress</span>
+      <span class="section-icon">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="field full">
+        <label>
+          Work Being Performed
+          <button class="mic-btn" onclick="startVoice('workProgress')">
+            <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3zm-1 3a1 1 0 0 1 2 0v8a1 1 0 0 1-2 0V4zm6 8a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.93V21h-2v2h6v-2h-2v-2.07A7 7 0 0 0 19 12h-2z"/></svg>
+            Voice
+          </button>
+        </label>
+        <textarea id="workProgress" placeholder="Describe active excavations, installations, reinstatements, etc..."></textarea>
+      </div>
+      <div class="field full">
+        <label>
+          Materials on Site / Piles
+          <button class="mic-btn" onclick="startVoice('materials')">
+            <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3zm-1 3a1 1 0 0 1 2 0v8a1 1 0 0 1-2 0V4zm6 8a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.93V21h-2v2h6v-2h-2v-2.07A7 7 0 0 0 19 12h-2z"/></svg>
+            Voice
+          </button>
+        </label>
+        <textarea id="materials" placeholder="e.g. GA pile at Clare and Evered, piles of sand/concrete from Tweedsmuir to Athlone..."></textarea>
+      </div>
+      <div class="field full">
+        <label>
+          Subcontractors on Site
+          <button class="mic-btn" onclick="startVoice('subcontractors')">
+            <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3zm-1 3a1 1 0 0 1 2 0v8a1 1 0 0 1-2 0V4zm6 8a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.93V21h-2v2h6v-2h-2v-2.07A7 7 0 0 0 19 12h-2z"/></svg>
+            Voice
+          </button>
+        </label>
+        <textarea id="subcontractors" placeholder="e.g. Aecon working on St Laurent, AMS pouring concrete at Findlay Creek..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. SITE CONDITIONS & SAFETY -->
+  <div class="section" id="sec-safety">
+    <div class="section-header" onclick="toggleSection('sec-safety')">
+      <span class="section-title">07 — Site Conditions &amp; Safety</span>
+      <span class="section-icon">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="toggle-grid">
+        <div class="toggle-item">
+          <span class="toggle-label">Detour Route OK</span>
+          <label class="toggle-switch"><input type="checkbox" id="detourOk" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-item">
+          <span class="toggle-label">Signage OK</span>
+          <label class="toggle-switch"><input type="checkbox" id="signageOk" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-item">
+          <span class="toggle-label">Barrels OK</span>
+          <label class="toggle-switch"><input type="checkbox" id="barrelsOk" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-item">
+          <span class="toggle-label">Tree Fencing OK</span>
+          <label class="toggle-switch"><input type="checkbox" id="treeFenceOk" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-item">
+          <span class="toggle-label">Excav. Fenced</span>
+          <label class="toggle-switch"><input type="checkbox" id="excavFenced" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-item">
+          <span class="toggle-label">Bathrooms Clean</span>
+          <label class="toggle-switch"><input type="checkbox" id="bathroomsClean"><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Dumpster Status</label>
+          <select id="dumpsterStatus">
+            <option value="">-- Select --</option>
+            <option>Empty</option>
+            <option>Partially full – room remaining</option>
+            <option>Mostly full</option>
+            <option>Full – needs emptying</option>
+            <option>N/A</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Road Condition</label>
+          <select id="roadCondition">
+            <option value="">-- Select --</option>
+            <option>Good – driveable</option>
+            <option>Uneven – passable</option>
+            <option>Rough – barely driveable</option>
+            <option>Closed</option>
+            <option>N/A</option>
+          </select>
+        </div>
+      </div>
+      <div class="field full">
+        <label>
+          Safety / Conditions Notes
+          <button class="mic-btn" onclick="startVoice('safetyNotes')">
+            <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3zm-1 3a1 1 0 0 1 2 0v8a1 1 0 0 1-2 0V4zm6 8a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.93V21h-2v2h6v-2h-2v-2.07A7 7 0 0 0 19 12h-2z"/></svg>
+            Voice
+          </button>
+        </label>
+        <textarea id="safetyNotes" placeholder="Any additional safety observations..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. ADMIN -->
+  <div class="section" id="sec-admin">
+    <div class="section-header" onclick="toggleSection('sec-admin')">
+      <span class="section-title">08 — Admin Items</span>
+      <span class="section-icon">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="toggle-grid">
+        <div class="toggle-item">
+          <span class="toggle-label">DEWR Outstanding</span>
+          <label class="toggle-switch"><input type="checkbox" id="dewr"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-item">
+          <span class="toggle-label">Locates Needed</span>
+          <label class="toggle-switch"><input type="checkbox" id="locates"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-item">
+          <span class="toggle-label">Stone Tickets</span>
+          <label class="toggle-switch"><input type="checkbox" id="stoneTickets"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-item">
+          <span class="toggle-label">Truck Tickets</span>
+          <label class="toggle-switch"><input type="checkbox" id="truckTickets"><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+      <div class="field full">
+        <label>
+          Follow-up Notes / Action Items
+          <button class="mic-btn" onclick="startVoice('followUp')">
+            <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3zm-1 3a1 1 0 0 1 2 0v8a1 1 0 0 1-2 0V4zm6 8a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.93V21h-2v2h6v-2h-2v-2.07A7 7 0 0 0 19 12h-2z"/></svg>
+            Voice
+          </button>
+        </label>
+        <textarea id="followUp" placeholder="e.g. Show Corey how to use Soil Flo tomorrow morning, pick up locates at Walgreen office..."></textarea>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end container -->
+
+<!-- EXPORT BAR -->
+<div class="export-bar">
+  <button class="btn-secondary" onclick="clearForm()">Clear</button>
+  <button class="btn-primary" onclick="previewReport()">Preview &amp; Copy Report</button>
+</div>
+
+<!-- PREVIEW MODAL -->
+<div class="modal-overlay" id="previewModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Report Preview</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <pre class="preview-text" id="previewContent"></pre>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal()">Close</button>
+      <button class="btn-primary" onclick="copyReport()">Copy to Clipboard</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATE ──────────────────────────────────────────────────
+const now = new Date();
+const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const dateStr = `${days[now.getDay()]} ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+document.getElementById('headerDate').textContent = dateStr;
+document.getElementById('jobDate').value = dateStr;
+
+// ── SECTIONS ─────────────────────────────────────────────
+function toggleSection(id) {
+  document.getElementById(id).classList.toggle('collapsed');
+}
+
+// ── TRUCKS ───────────────────────────────────────────────
+let truckCount = 0;
+
+function addTruck(data={}) {
+  truckCount++;
+  const id = `truck-${Date.now()}`;
+  const list = document.getElementById('truckList');
+  const addBtn = list.querySelector('.add-btn');
+
+  const div = document.createElement('div');
+  div.className = 'truck-entry';
+  div.id = id;
+  div.innerHTML = `
+    <button class="remove-btn" onclick="removeTruck('${id}')">×</button>
+    <div class="field-row" style="margin-bottom:8px">
+      <div class="field">
+        <label>Ordered By (Foreman)</label>
+        <input type="text" value="${data.foreman||''}" placeholder="e.g. Kevin Dillabough" oninput="updateTruckTotal()">
+      </div>
+      <div class="field">
+        <label>Truck Count</label>
+        <input type="number" value="${data.count||1}" min="1" style="width:70px" oninput="updateTruckTotal()">
+      </div>
+    </div>
+    <div class="field-row three">
+      <div class="field">
+        <label>Truck IDs</label>
+        <input type="text" value="${data.ids||''}" placeholder="e.g. 237, Kelly Bros 01, 02">
+      </div>
+      <div class="field">
+        <label>Arriving</label>
+        <select>
+          <option ${(data.arriving||'')==='Empty'?'selected':''}>Empty</option>
+          <option ${(data.arriving||'')==='With material'?'selected':''}>With material</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Material / Source</label>
+        <input type="text" value="${data.material||''}" placeholder="e.g. Granular A – Goulbourn Quarry">
+      </div>
+    </div>
+  `;
+  list.insertBefore(div, addBtn);
+  updateTruckTotal();
+}
+
+function removeTruck(id) {
+  document.getElementById(id).remove();
+  updateTruckTotal();
+}
+
+function updateTruckTotal() {
+  let total = 0;
+  document.querySelectorAll('#truckList .truck-entry input[type="number"]').forEach(i => {
+    total += parseInt(i.value)||0;
+  });
+  document.getElementById('truckTotal').textContent = total;
+}
+
+// ── CREWS ────────────────────────────────────────────────
+function addCrew(data={}) {
+  const id = `crew-${Date.now()}`;
+  const list = document.getElementById('crewList');
+  const addBtn = list.querySelector('.add-btn');
+
+  const div = document.createElement('div');
+  div.className = 'crew-entry';
+  div.id = id;
+  div.innerHTML = `
+    <button class="remove-btn" onclick="document.getElementById('${id}').remove()">×</button>
+    <div class="field-row" style="margin-bottom:8px">
+      <div class="field">
+        <label>Crew Type</label>
+        <select>
+          <option>Sewer Crew</option>
+          <option>Grading Crew</option>
+          <option>Direct Bore</option>
+          <option>Subcontractor</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Foreman</label>
+        <input type="text" value="${data.foreman||''}" placeholder="Name / Truck #">
+      </div>
+    </div>
+    <div class="field-row three">
+      <div class="field">
+        <label>Labourers</label>
+        <input type="number" value="${data.labourers||0}" min="0" style="width:70px">
+      </div>
+      <div class="field">
+        <label>Foremen</label>
+        <input type="number" value="${data.foremen||1}" min="0" style="width:70px">
+      </div>
+      <div class="field">
+        <label>Operators</label>
+        <input type="number" value="${data.operators||0}" min="0" style="width:70px">
+      </div>
+    </div>
+    <div class="field full" style="margin-top:8px">
+      <label>Location / Notes</label>
+      <input type="text" value="${data.notes||''}" placeholder="e.g. Clare & Evered excavation, working on watermain tie-ins">
+    </div>
+  `;
+  list.insertBefore(div, addBtn);
+}
+
+// ── FLAGGERS ─────────────────────────────────────────────
+function addFlagger(location='') {
+  const list = document.getElementById('flaggerList');
+  const row = document.createElement('div');
+  row.className = 'flagger-row';
+  row.innerHTML = `
+    <input type="text" value="${location}" placeholder="e.g. Clare & Evered – both sides" oninput="updateFlaggerTotal()">
+    <button onclick="this.parentElement.remove(); updateFlaggerTotal()">×</button>
+  `;
+  list.appendChild(row);
+  updateFlaggerTotal();
+}
+
+function updateFlaggerTotal() {
+  const count = document.querySelectorAll('#flaggerList .flagger-row').length;
+  document.getElementById('flaggerTotal').textContent = count;
+}
+
+// ── VOICE INPUT ───────────────────────────────────────────
+let recognition = null;
+let activeField = null;
+let activeMicBtn = null;
+
+function startVoice(fieldId) {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    alert('Voice input is not supported in this browser. Try Chrome or Edge.');
+    return;
+  }
+
+  // Stop any active session
+  if (recognition) {
+    recognition.stop();
+    recognition = null;
+    if (activeMicBtn) {
+      activeMicBtn.classList.remove('listening');
+      activeMicBtn.innerHTML = micIcon('Voice');
+    }
+    document.getElementById('voiceStatus').classList.remove('show');
+    if (activeField === fieldId) { activeField = null; activeMicBtn = null; return; }
+  }
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  recognition.lang = 'en-CA';
+  recognition.continuous = true;
+  recognition.interimResults = false;
+
+  const btn = event.currentTarget;
+  activeMicBtn = btn;
+  activeField = fieldId;
+
+  btn.classList.add('listening');
+  btn.innerHTML = micIcon('Stop');
+  document.getElementById('voiceStatus').classList.add('show');
+
+  recognition.onresult = (e) => {
+    const transcript = Array.from(e.results)
+      .map(r => r[0].transcript).join(' ');
+    const el = document.getElementById(fieldId);
+    if (el) {
+      el.value = (el.value ? el.value + ' ' : '') + transcript;
+    }
+  };
+
+  recognition.onerror = () => stopVoice(btn);
+  recognition.onend = () => stopVoice(btn);
+  recognition.start();
+}
+
+function stopVoice(btn) {
+  if (recognition) { recognition.stop(); recognition = null; }
+  if (btn) { btn.classList.remove('listening'); btn.innerHTML = micIcon('Voice'); }
+  document.getElementById('voiceStatus').classList.remove('show');
+  activeField = null; activeMicBtn = null;
+}
+
+function micIcon(label) {
+  return `<svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3zm-1 3a1 1 0 0 1 2 0v8a1 1 0 0 1-2 0V4zm6 8a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.93V21h-2v2h6v-2h-2v-2.07A7 7 0 0 0 19 12h-2z"/></svg>${label}`;
+}
+
+// ── REPORT GENERATION ────────────────────────────────────
+function gv(id) { return (document.getElementById(id)||{}).value || ''; }
+function gb(id) { return document.getElementById(id)?.checked; }
+
+function buildReport() {
+  const lines = [];
+  const yn = b => b ? 'Yes' : 'No';
+
+  lines.push('='.repeat(60));
+  lines.push('DAILY WORK REPORT');
+  lines.push('='.repeat(60));
+
+  // Header
+  lines.push('');
+  lines.push('JOB INFORMATION');
+  lines.push('-'.repeat(40));
+  lines.push(`Date:             ${gv('jobDate')}`);
+  lines.push(`Arrival Time:     ${gv('arrivalTime')}`);
+  lines.push(`Job Number:       ${gv('jobNumber')}`);
+  lines.push(`Job Name:         ${gv('jobName')}`);
+  lines.push(`Temperature:      ${gv('temp')}°C`);
+  lines.push(`Sky/Conditions:   ${gv('sky')}`);
+  lines.push(`Work Location(s): ${gv('workLocation')}`);
+
+  // Trucks
+  lines.push('');
+  lines.push('TRUCKS ON SITE');
+  lines.push('-'.repeat(40));
+  const truckEntries = document.querySelectorAll('#truckList .truck-entry');
+  if (truckEntries.length === 0) {
+    lines.push('  No trucks on site');
+  } else {
+    truckEntries.forEach((entry, i) => {
+      const inputs = entry.querySelectorAll('input, select');
+      const foreman = inputs[0]?.value || '—';
+      const count = inputs[1]?.value || '0';
+      const ids = inputs[2]?.value || '—';
+      const arriving = inputs[3]?.value || '—';
+      const material = inputs[4]?.value || '—';
+      lines.push(`  Group ${i+1}: ${count} truck(s) ordered by ${foreman}`);
+      lines.push(`    IDs: ${ids}`);
+      lines.push(`    Arriving: ${arriving} | ${material}`);
+    });
+    lines.push(`  TOTAL TRI-AXLES ON SITE: ${gv('truckTotal') || document.getElementById('truckTotal').textContent}`);
+  }
+
+  // Crews
+  lines.push('');
+  lines.push('CREWS ON SITE');
+  lines.push('-'.repeat(40));
+  const crewEntries = document.querySelectorAll('#crewList .crew-entry');
+  if (crewEntries.length === 0) {
+    lines.push('  No crew data entered');
+  } else {
+    crewEntries.forEach((entry, i) => {
+      const inputs = entry.querySelectorAll('input, select');
+      const type = inputs[0]?.value || '—';
+      const foreman = inputs[1]?.value || '—';
+      const lab = inputs[2]?.value || '0';
+      const fore = inputs[3]?.value || '0';
+      const ops = inputs[4]?.value || '0';
+      const notes = inputs[5]?.value || '';
+      lines.push(`  Crew ${i+1} [${type}]: ${lab} labourers, ${fore} foreman, ${ops} operators`);
+      lines.push(`    Foreman/Truck: ${foreman}`);
+      if (notes) lines.push(`    Location: ${notes}`);
+    });
+  }
+
+  // Equipment
+  lines.push('');
+  lines.push('EQUIPMENT ON SITE');
+  lines.push('-'.repeat(40));
+  if (gv('shovels')) lines.push(`  Shovels/Excavators: ${gv('shovels')}`);
+  if (gv('loaders'))  lines.push(`  Loaders:            ${gv('loaders')}`);
+  if (gv('rollers'))  lines.push(`  Rollers:            ${gv('rollers')}`);
+  lines.push(`  Diesel Plates:      ${gv('plates') || 0}`);
+  lines.push(`  Jumping Jacks:      ${gv('jacks') || 0}`);
+  if (gv('otherEquip')) lines.push(`  Other:              ${gv('otherEquip')}`);
+  if (gv('equipNotes')) lines.push(`  Notes: ${gv('equipNotes')}`);
+
+  // Flaggers
+  lines.push('');
+  lines.push('FLAGGERS');
+  lines.push('-'.repeat(40));
+  const flagRows = document.querySelectorAll('#flaggerList .flagger-row input');
+  if (flagRows.length === 0) {
+    lines.push('  No flaggers on site');
+  } else {
+    lines.push(`  Total: ${flagRows.length}`);
+    flagRows.forEach(f => { if(f.value) lines.push(`  - ${f.value}`); });
+  }
+
+  // Work Progress
+  lines.push('');
+  lines.push('ACTIVE WORK & PROGRESS');
+  lines.push('-'.repeat(40));
+  if (gv('workProgress'))   lines.push(`  Work: ${gv('workProgress')}`);
+  if (gv('materials'))      lines.push(`  Materials on site: ${gv('materials')}`);
+  if (gv('subcontractors')) lines.push(`  Subcontractors: ${gv('subcontractors')}`);
+
+  // Safety
+  lines.push('');
+  lines.push('SITE CONDITIONS & SAFETY');
+  lines.push('-'.repeat(40));
+  lines.push(`  Detour Route OK:     ${yn(gb('detourOk'))}`);
+  lines.push(`  Signage OK:          ${yn(gb('signageOk'))}`);
+  lines.push(`  Barrels OK:          ${yn(gb('barrelsOk'))}`);
+  lines.push(`  Tree Fencing OK:     ${yn(gb('treeFenceOk'))}`);
+  lines.push(`  Excavation Fenced:   ${yn(gb('excavFenced'))}`);
+  lines.push(`  Bathrooms Clean:     ${yn(gb('bathroomsClean'))}`);
+  lines.push(`  Dumpster Status:     ${gv('dumpsterStatus') || 'N/A'}`);
+  lines.push(`  Road Condition:      ${gv('roadCondition') || 'N/A'}`);
+  if (gv('safetyNotes')) lines.push(`  Notes: ${gv('safetyNotes')}`);
+
+  // Admin
+  lines.push('');
+  lines.push('ADMIN ITEMS');
+  lines.push('-'.repeat(40));
+  lines.push(`  DEWR Outstanding:   ${yn(gb('dewr'))}`);
+  lines.push(`  Locates Needed:     ${yn(gb('locates'))}`);
+  lines.push(`  Stone Tickets:      ${yn(gb('stoneTickets'))}`);
+  lines.push(`  Truck Tickets:      ${yn(gb('truckTickets'))}`);
+  if (gv('followUp')) lines.push(`  Follow-up: ${gv('followUp')}`);
+
+  lines.push('');
+  lines.push('='.repeat(60));
+  return lines.join('\n');
+}
+
+function previewReport() {
+  document.getElementById('previewContent').textContent = buildReport();
+  document.getElementById('previewModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('previewModal').classList.remove('open');
+}
+
+function copyReport() {
+  const text = document.getElementById('previewContent').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.modal-footer .btn-primary');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy to Clipboard', 2000);
+  });
+}
+
+function clearForm() {
+  if (!confirm('Clear all fields?')) return;
+  document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(el => { if (el.id !== 'jobDate') el.value = ''; });
+  document.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+  document.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
+  document.getElementById('truckList').innerHTML = '<button class="add-btn" onclick="addTruck()">+ Add Truck Group</button>';
+  document.getElementById('crewList').innerHTML  = '<button class="add-btn" onclick="addCrew()">+ Add Crew</button>';
+  document.getElementById('flaggerList').innerHTML = '';
+  document.getElementById('truckTotal').textContent = '0';
+  document.getElementById('flaggerTotal').textContent = '0';
+}
+
+// Close modal on overlay click
+document.getElementById('previewModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>
